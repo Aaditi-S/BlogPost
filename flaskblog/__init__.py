@@ -14,25 +14,44 @@ login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
 mail = Mail()
 
+app = Flask(__name__)
+app.config.from_object(Config)
 
+db.init_app(app)
+bcrypt.init_app(app)
+login_manager.init_app(app)
+mail.init_app(app)
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(Config)
+from flaskblog.users.routes import users
+from flaskblog.posts.routes import posts
+from flaskblog.main.routes import main
+from flaskblog.errors.handlers import errors
 
-    db.init_app(app)
-    bcrypt.init_app(app)
-    login_manager.init_app(app)
-    mail.init_app(app)
+app.register_blueprint(users)
+app.register_blueprint(posts)
+app.register_blueprint(main)
+app.register_blueprint(errors)
 
-    from flaskblog.users.routes import users
-    from flaskblog.posts.routes import posts
-    from flaskblog.main.routes import main
-    from flaskblog.errors.handlers import errors
+with app.app_context():
+    db.create_all()
+# def create_app(config_class=Config):
+#     app = Flask(__name__)
+#     app.config.from_object(Config)
 
-    app.register_blueprint(users)
-    app.register_blueprint(posts)
-    app.register_blueprint(main)
-    app.register_blueprint(errors)
+#     db.init_app(app)
+#     bcrypt.init_app(app)
+#     login_manager.init_app(app)
+#     mail.init_app(app)
 
-    return app
+#     from flaskblog.users.routes import users
+#     from flaskblog.posts.routes import posts
+#     from flaskblog.main.routes import main
+#     from flaskblog.errors.handlers import errors
+
+#     app.register_blueprint(users)
+#     app.register_blueprint(posts)
+#     app.register_blueprint(main)
+#     app.register_blueprint(errors)
+
+#     return app
+
